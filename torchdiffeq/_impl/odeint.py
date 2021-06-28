@@ -1,5 +1,5 @@
 import torch
-from torch.autograd.functional import vjp
+# from torch.autograd.functional import vjp
 from .dopri5 import Dopri5Solver
 from .bosh3 import Bosh3Solver
 from .adaptive_heun import AdaptiveHeunSolver
@@ -126,7 +126,7 @@ def odeint_event(func, y0, t0, *, event_fn, reverse_time=False, odeint_interface
 
     return event_t, solution
 
-
+'''
 class ImplicitFnGradientRerouting(torch.autograd.Function):
 
     @staticmethod
@@ -162,3 +162,4 @@ class ImplicitFnGradientRerouting(torch.autograd.Function):
         grad_state = grad_state + dstate
 
         return None, None, None, grad_state
+'''
