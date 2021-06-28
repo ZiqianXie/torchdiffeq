@@ -3,6 +3,8 @@
 This library provides ordinary differential equation (ODE) solvers implemented in PyTorch. Backpropagation through ODE solutions is supported using the adjoint method for constant memory cost. For usage of ODE solvers in deep learning applications, see reference [1].
 
 As the solvers are implemented in PyTorch, algorithms in this repository are fully supported to run on the GPU.
+## Modification
+Removed `torch.autograd.functional` dependency by removing the `odeint_event` function to be run on torch 1.4.0. 
 
 ## Installation
 
@@ -13,7 +15,7 @@ pip install torchdiffeq
 
 To install latest on GitHub:
 ```
-pip install git+https://github.com/rtqichen/torchdiffeq
+pip install git+https://github.com/ZiqianXie/torchdiffeq
 ```
 
 ## Examples
@@ -51,34 +53,6 @@ odeint(func, y0, t)
 `odeint_adjoint` simply wraps around `odeint`, but will use only O(1) memory in exchange for solving an adjoint ODE in the backward call.
 
 The biggest **gotcha** is that `func` must be a `nn.Module` when using the adjoint method. This is used to collect parameters of the differential equation.
-
-## Differentiable event handling
-
-We allow terminating an ODE solution based on an event function. Backpropagation through most solvers is supported. For usage of event handling in deep learning applications, see reference [2].
-
-This can be invoked with `odeint_event`:
-```
-from torchdiffeq import odeint_event
-odeint_event(func, y0, t0, *, event_fn, reverse_time=False, odeint_interface=odeint, **kwargs)
-```
- - `func` and `y0` are the same as `odeint`.
- - `t0` is a scalar representing the initial time value.
- - `event_fn(t, y)` returns a tensor, and is a required keyword argument.
- - `reverse_time` is a boolean specifying whether we should solve in reverse time. Default is `False`.
- - `odeint_interface` is one of `odeint` or `odeint_adjoint`, specifying whether adjoint mode should be used for differentiating through the ODE solution. Default is `odeint`.
- - `**kwargs`: any remaining keyword arguments are passed to `odeint_interface`.
-
-The solve is terminated at an event time `t` and state `y` when an element of `event_fn(t, y)` is equal to zero. Multiple outputs from `event_fn` can be used to specify multiple event functions, of which the first to trigger will terminate the solve.
-
-Both the event time and final state are returned from `odeint_event`, and can be differentiated. Gradients will be backpropagated through the event function.
-
-The numerical precision for the event time is determined by the `atol` argument.
-
-See example of simulating and differentiating through a bouncing ball in [`examples/bouncing_ball.py`](./examples/bouncing_ball.py).
-
-<p align="center">
-<img align="middle" src="./assets/bouncing_ball.png" alt="Bouncing Ball" width="500" height="250" />
-</p>
 
 ## Keyword arguments for odeint(_adjoint)
 
